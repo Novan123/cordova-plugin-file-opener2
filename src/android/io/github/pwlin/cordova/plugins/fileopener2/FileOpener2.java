@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -92,6 +93,7 @@ public class FileOpener2 extends CordovaPlugin {
 
 	private void _open(String fileArg, String contentType, Boolean openWithDefault, CallbackContext callbackContext) throws JSONException {
 		String fileName = "";
+		
 		try {
 			CordovaResourceApi resourceApi = webView.getResourceApi();
 			Uri fileUri = resourceApi.remapUri(Uri.parse(fileArg));
@@ -99,11 +101,13 @@ public class FileOpener2 extends CordovaPlugin {
 		} catch (Exception e) {
 			fileName = fileArg;
 		}
+		
 		File file = new File(fileName);
+		
 		if (file.exists()) {
 			try {
 				Intent intent;
-				Uri path = null;
+				Uri path;
 				
 				if (contentType.equals("application/vnd.android.package-archive")) {
 					// https://stackoverflow.com/questions/9637629/can-we-install-an-apk-from-a-contentprovider/9672282#9672282
@@ -121,7 +125,7 @@ public class FileOpener2 extends CordovaPlugin {
 				} else {
 					intent = new Intent(Intent.ACTION_VIEW);
 					Context context = cordova.getActivity().getApplicationContext();
-					Uri path = FileProvider.getUriForFile(context, cordova.getActivity().getPackageName() + ".opener.provider", file);
+					path = FileProvider.getUriForFile(context, cordova.getActivity().getPackageName() + ".opener.provider", file);
 					intent.setDataAndType(path, contentType);
 					intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NO_HISTORY);
 				}
